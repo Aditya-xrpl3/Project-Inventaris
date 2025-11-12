@@ -130,3 +130,73 @@ Dokumen ini adalah **BUKU MENU & BUKU RESEP** (Kontrak API) kita.
 >   }
 > ]
 > ```
+>
+> ## 🚀 Cara Menjalankan Proyek (Setup Awal)
+
+Ini adalah instruksi untuk **SETELAH** kamu `git clone` atau `git pull` proyek ini untuk pertama kalinya.
+
+Kita punya 2 "server" yang harus berjalan **BERSAMAAN** di **2 TERMINAL** yang berbeda.
+
+---
+
+### 👨‍🍳 Untuk Tim Backend (Dapur)
+Ini cara "menyalakan kompor" Dapur Django.
+
+1.  **Buka Terminal 1.**
+2.  Masuk ke folder backend:
+    ```bash
+    cd inventaris_backend
+    ```
+3.  Buat & aktifkan *virtual environment* (jika ini pertama kalimu):
+    ```bash
+    # (Hanya lakukan ini SEKALI)
+    python -m venv venv
+    
+    # Aktifkan (Windows)
+    venv\Scripts\activate
+    
+    # Aktifkan (Mac/Linux)
+    source venv/bin/activate
+    ```
+4.  Install semua "bahan" (library) yang dibutuhkan:
+    ```bash
+    pip install -r requirements.txt
+    ```
+5.  Siapkan "Gudang" (Database) - *Tugas Tim Database*:
+    ```bash
+    python manage.py migrate
+    ```
+6.  Nyalakan "Kompor" (Jalankan server):
+    ```bash
+    python manage.py runserver
+    ```
+    ✅ **Sukses!** Dapur (Backend) kamu sekarang buka di `http://127.0.0.1:8000`
+
+---
+
+### 🙋‍♂️ Untuk Tim Frontend (Ruang Makan)
+Ini cara "membuka pintu" Ruang Makan React.
+
+1.  **Buka Terminal 2 (TERMINAL BARU, JANGAN TUTUP TERMINAL 1).**
+2.  Masuk ke folder frontend:
+    ```bash
+    cd inventaris_frontend
+    ```
+3.  Install semua "peralatan" (library) yang dibutuhkan:
+    ```bash
+    npm install
+    ```
+4.  Buka "Pintu Restoran" (Jalankan server):
+    ```bash
+    npm run dev
+    ```
+    ✅ **Sukses!** Ruang Makan (Frontend) kamu sekarang buka di `http://localhost:5173` (atau alamat lain yang diberikan).
+
+---
+
+### 🔥 PENTING: Restoran Buka!
+Kamu sekarang punya **2 server yang jalan bersamaan**:
+* **Backend** di `localhost:8000`
+* **Frontend** di `localhost:5173`
+
+Frontend akan otomatis "memesan" ke Backend. Kamu bisa buka `http://localhost:5173` di browser-mu untuk melihat aplikasinya.
