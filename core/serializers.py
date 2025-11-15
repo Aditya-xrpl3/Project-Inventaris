@@ -1,15 +1,30 @@
+# core/serializers.py
 from rest_framework import serializers
-# dari django.contrib.auth.models dan .models dihapus aja biar gak error
+from .models import Barang, Kategori, Meja
+
+class KategoriSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Kategori
+        fields = ['nama_kategori']
+
+class MejaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Meja
+        fields = ['nama_meja', 'lokasi']
 
 
-# Create your serializers here.
+class BarangSerializer(serializers.ModelSerializer):
+    # Tampilkan nama relasi, bukan ID
+    kategori = serializers.StringRelatedField()
+    meja = serializers.StringRelatedField()
 
-from rest_framework import serializers
-
-class BarangSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    nama_barang = serializers.CharField(max_length=100)
-    kategori = serializers.CharField(max_length=100)
-    jumlah = serializers.IntegerField()
-
-
+    class Meta:
+        model = Barang
+        fields = [
+            'id',
+            'nama_barang',
+            'kode_barang',
+            'status',
+            'kategori',
+            'meja'
+        ]
