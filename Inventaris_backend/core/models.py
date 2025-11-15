@@ -36,20 +36,16 @@ class Barang(models.Model):
     def __str__(self):
         return self.nama_barang
 
-
-class PC(models.Model):
-
-    STATUS_PC = [
-        ('BAIK', 'Baik'),
-        ('RUSAK', 'Rusak'),
-        ('MAINTENANCE', 'Maintenance'),
-    ]
-
-    nama_pc = models.CharField(max_length=100)
-    kode_pc = models.CharField(max_length=100, unique=True)
-    meja = models.ForeignKey(Meja, on_delete=models.SET_NULL, null=True)
-    spesifikasi = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_PC, default='BAIK')
+class LaporanKerusakan(models.Model):
+    barang = models.ForeignKey(Barang, on_delete=models.CASCADE)   
+    deskripsi = models.TextField()
+    status_laporan = models.CharField(max_length=20, choices=[
+        ('Baru', 'Baru'),
+        ('Diproses', 'Sedang Diproses'),
+        ('Selesai', 'Selesai'),
+    ], default='Baru')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.nama_pc
+        return f"Laporan {self.barang.nama_barang} - {self.status_laporan}"

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
-from .models import Kategori, Meja, Barang, PC
+from .models import Kategori, Meja, Barang, LaporanKerusakan
 
 # Create your serializers here.
 
@@ -22,8 +22,7 @@ class BarangSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PCSerializer(serializers.ModelSerializer):
+class LaporanKerusakanSerializer(serializers.ModelSerializer):
     class Meta:
-        model = PC
+        model = LaporanKerusakan
         fields = '__all__'
-

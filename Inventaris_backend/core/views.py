@@ -3,10 +3,10 @@ from .permissions import UserAnonCanCreate # fungsinya agar user tidak perlu log
 # Create your views here.
 
 from rest_framework import viewsets
-from .models import Kategori, Meja, Barang, PC
+from .models import Kategori, Meja, Barang, LaporanKerusakan
 from .serializers import (
     KategoriSerializer, MejaSerializer,
-    BarangSerializer, PCSerializer
+    BarangSerializer, LaporanKerusakanSerializer
 )
 
 class KategoriViewSet(viewsets.ModelViewSet):
@@ -27,7 +27,9 @@ class BarangViewSet(viewsets.ModelViewSet):
     permission_classes = [UserAnonCanCreate]
 
 
-class PCViewSet(viewsets.ModelViewSet):
-    queryset = PC.objects.all()
-    serializer_class = PCSerializer
+class LaporanKerusakanViewSet(viewsets.ModelViewSet):
+    queryset = LaporanKerusakan.objects.all()
+    serializer_class = LaporanKerusakanSerializer
     permission_classes = [UserAnonCanCreate]
+
+
