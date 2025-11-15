@@ -37,7 +37,8 @@ class Barang(models.Model):
         return self.nama_barang
 
 class LaporanKerusakan(models.Model):
-    barang = models.ForeignKey(Barang, on_delete=models.CASCADE)   
+    meja = models.ForeignKey(Meja, on_delete=models.SET_NULL, null=True)
+    
     deskripsi = models.TextField()
     status_laporan = models.CharField(max_length=20, choices=[
         ('Baru', 'Baru'),
@@ -45,7 +46,7 @@ class LaporanKerusakan(models.Model):
         ('Selesai', 'Selesai'),
     ], default='Baru')
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now_True)
 
     def __str__(self):
-        return f"Laporan {self.barang.nama_barang} - {self.status_laporan}"
+        return f"Laporan {self.meja.nama_meja} - {self.status_laporan}"
