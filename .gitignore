@@ -1,43 +1,46 @@
-# --- Virtual Environment (biar repo nggak kegedean) ---
-venv/
-.venv/
-
-# --- Python Cache (file sementara, aman di-skip) ---
-__pycache__/
-*.pyc
-
-# --- Database Lokal (tiap dev beda, jangan masuk repo) ---
-*.sqlite3
-db.sqlite3
-
-# --- File Konfigurasi Rahasia (isi password, token, dll) ---
+# --- File Rahasia (Berisi password database, dll) ---
 .env
 *.env
-
-
-# --- Node.js Library (ukuran gede banget, jangan dipush) ---
-node_modules/
-
-# --- Build Output Frontend (bisa digenerate ulang) ---
-dist/
-
-# --- Cache Tools Frontend (biar repo bersih) ---
-.vite/
-
-# --- File Rahasia Frontend (lingkungan dev) ---
 .env.local
 .env.*.local
 
-# --- File Log Error (otomatis, nggak penting di repo) ---
+# --- Python / Django ---
+# Folder Virtual Environment (JANGAN di-upload)
+venv/
+.venv/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Database lokal (JANGAN di-upload)
+*.sqlite3
+db.sqlite3
+
+# --- Node.js / React (Vite) ---
+# Folder Library (SANGAT BESAR, JANGAN di-upload)
+node_modules/
+
+# Hasil 'npm run build'
+dist/
+
+# Cache Vite
+.vite/
+
+# Log Error
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# --- Sistem Operasi & IDE ---
+# Mac
+.DS_Store
 
-# --- Sampah Sistem Operasi ---
-.DS_Store        # Mac
-Thumbs.db        # Windows
+# Windows
+Thumbs.db
 
-# --- Folder Editor (settingan pribadi developer) ---
+# VS Code
 .vscode/
+
+# JetBrains (PyCharm, WebStorm)
 .idea/
