@@ -1,7 +1,7 @@
 # core/views.py
 from rest_framework import generics, permissions, filters
 from .models import Barang, LaporanKerusakan
-from .serializers import BarangSerializer, LaporanKerusakanCreateSerializers
+from .serializers import BarangSerializer, LaporanKerusakanCreateSerializer
 
 class BarangListView(generics.ListAPIView):
     queryset = Barang.objects.all()
