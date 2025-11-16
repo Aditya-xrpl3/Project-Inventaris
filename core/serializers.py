@@ -28,7 +28,7 @@ class BarangSerializer(serializers.ModelSerializer):
         ]
 
 # 🔹 ini revisinya
-class LaporanKerusakanCreateSerializers(serializers.ModelSerializer):
+class LaporanKerusakanCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = LaporanKerusakan
         fields = ['meja', 'deskripsi']
