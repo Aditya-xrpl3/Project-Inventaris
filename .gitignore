@@ -1,3 +1,9 @@
+# --- File Rahasia (Berisi password database, dll) ---
+.env
+*.env
+.env.local
+.env.*.local
+
 # --- Python / Django ---
 # Folder Virtual Environment (JANGAN di-upload)
 venv/
@@ -11,11 +17,6 @@ __pycache__/
 *.sqlite3
 db.sqlite3
 
-# File Rahasia (Berisi password database, dll)
-.env
-*.env
-
-
 # --- Node.js / React (Vite) ---
 # Folder Library (SANGAT BESAR, JANGAN di-upload)
 node_modules/
@@ -26,15 +27,10 @@ dist/
 # Cache Vite
 .vite/
 
-# File Rahasia Frontend
-.env.local
-.env.*.local
-
 # Log Error
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
 
 # --- Sistem Operasi & IDE ---
 # Mac

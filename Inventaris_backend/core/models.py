@@ -37,9 +37,9 @@ class Barang(models.Model):
     def __str__(self):
         return self.nama_barang
 
+
 class LaporanKerusakan(models.Model):
     meja = models.ForeignKey(Meja, on_delete=models.SET_NULL, null=True)
-    
     deskripsi = models.TextField()
     status_laporan = models.CharField(max_length=20, choices=[
         ('Baru', 'Baru'),

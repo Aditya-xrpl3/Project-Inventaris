@@ -1,35 +1,67 @@
-from rest_framework import generics, permissions
-from .permissions import UserAnonCanCreate # fungsinya agar user tidak perlu login untuk POST
-# Create your views here.
-
-from rest_framework import viewsets
+# core/views.py
+from rest_framework import generics, permissions, filters, viewsets
 from .models import Kategori, Meja, Barang, LaporanKerusakan
 from .serializers import (
-    KategoriSerializer, MejaSerializer,
-    BarangSerializer, LaporanKerusakanSerializer
+    KategoriSerializer, 
+    MejaSerializer,
+    BarangSerializer, 
+    LaporanKerusakanSerializer,
+    LaporanKerusakanCreateSerializer # <-- Pastikan ini ada (dari file serializer)
 )
 
-class KategoriViewSet(viewsets.ModelViewSet):
-    queryset = Kategori.objects.all()
-    serializer_class = KategoriSerializer
-    permission_classes = [UserAnonCanCreate]
+# --- BAGIAN 1: API PUBLIK (Dari Tim Reporting) ---
+# Ini yang dipakai oleh ScanPage.jsx (Publik & Anonim)
 
-
-class MejaViewSet(viewsets.ModelViewSet):
-    queryset = Meja.objects.all()
-    serializer_class = MejaSerializer
-    permission_classes = [UserAnonCanCreate]
-
-
-class BarangViewSet(viewsets.ModelViewSet):
+class BarangListView(generics.ListAPIView):
+    """
+    [Publik] Mengambil daftar semua barang (GET)
+    """
     queryset = Barang.objects.all()
     serializer_class = BarangSerializer
-    permission_classes = [UserAnonCanCreate]
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['nama_barang', 'kode_barang', 'meja__nama_meja', 'kategori__nama_kategori']
+    ordering_fields = ['nama_barang', 'kategori', 'status']
 
+class LaporanKerusakanCreateView(generics.CreateAPIView):
+    """
+    [Publik] Membuat laporan kerusakan baru (POST)
+    """
+    queryset = LaporanKerusakan.objects.all()
+    serializer_class = LaporanKerusakanCreateSerializer # <-- Pakai resep 'Create'
+    permission_classes = [permissions.AllowAny]
+
+# --- BAGIAN 2: API ADMIN (Dari branch 'main') ---
+# Ini yang dipakai oleh AdminDashboard.jsx (Wajib Login)
+
+class KategoriViewSet(viewsets.ModelViewSet):
+    """
+    [Admin] CRUD (Create, Read, Update, Delete) untuk Kategori
+    """
+    queryset = Kategori.objects.all()
+    serializer_class = KategoriSerializer
+    permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
+
+class MejaViewSet(viewsets.ModelViewSet):
+    """
+    [Admin] CRUD (Create, Read, Update, Delete) untuk Meja
+    """
+    queryset = Meja.objects.all()
+    serializer_class = MejaSerializer
+    permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
+
+class BarangViewSet(viewsets.ModelViewSet):
+    """
+    [Admin] CRUD (Create, Read, Update, Delete) untuk Barang
+    """
+    queryset = Barang.objects.all()
+    serializer_class = BarangSerializer # <-- Admin bisa pakai resep ini
+    permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
 
 class LaporanKerusakanViewSet(viewsets.ModelViewSet):
+    """
+    [Admin] CRUD (Create, Read, Update, Delete) untuk Laporan
+    """
     queryset = LaporanKerusakan.objects.all()
-    serializer_class = LaporanKerusakanSerializer
-    permission_classes = [UserAnonCanCreate]
-
-
+    serializer_class = LaporanKerusakanSerializer # <-- Pakai resep LENGKAP
+    permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
