@@ -1,0 +1,17 @@
+# --- Framework Inti ---
+django
+
+# --- API (Buku Menu & Resep) ---
+djangorestframework
+
+# --- Otentikasi (Penjaga Pintu) ---
+djangorestframework-simplejwt
+
+# --- Database (Penerjemah PostgreSQL) ---
+psycopg2-binary
+
+# --- Keamanan (Izin untuk Frontend) ---
+django-cors-headers
+
+# --- Manajemen Rahasia (Kunci API & Password DB) ---
+python-decouple
