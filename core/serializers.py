@@ -1,6 +1,6 @@
 # core/serializers.py
 from rest_framework import serializers
-from .models import Barang, Kategori, Meja
+from .models import Barang, Kategori, Meja, LaporanKerusakan
 
 class KategoriSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,9 +12,7 @@ class MejaSerializer(serializers.ModelSerializer):
         model = Meja
         fields = ['nama_meja', 'lokasi']
 
-
 class BarangSerializer(serializers.ModelSerializer):
-    # Tampilkan nama relasi, bukan ID
     kategori = serializers.StringRelatedField()
     meja = serializers.StringRelatedField()
 
@@ -28,3 +26,9 @@ class BarangSerializer(serializers.ModelSerializer):
             'kategori',
             'meja'
         ]
+
+# 🔹 ini revisinya
+class LaporanKerusakanCreateSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = LaporanKerusakan
+        fields = '__all__'
