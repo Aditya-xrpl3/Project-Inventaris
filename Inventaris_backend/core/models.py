@@ -1,5 +1,8 @@
+# Ini adalah komentar untuk me-refresh PR
 from django.db import models
 from django.contrib.auth.models import User
+
+# Create your models here.
 
 class Kategori(models.Model):
     nama_kategori = models.CharField(max_length=100)
@@ -38,15 +41,13 @@ class Barang(models.Model):
 class LaporanKerusakan(models.Model):
     meja = models.ForeignKey(Meja, on_delete=models.SET_NULL, null=True)
     deskripsi = models.TextField()
-
     status_laporan = models.CharField(max_length=20, choices=[
         ('Baru', 'Baru'),
         ('Diproses', 'Sedang Diproses'),
         ('Selesai', 'Selesai'),
     ], default='Baru')
-
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)  # FIXED
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Laporan {self.meja.nama_meja} - {self.status_laporan}"

@@ -79,12 +79,12 @@ WSGI_APPLICATION = 'inventaris_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'inventaris_db',
-        'USER': 'inventaris',
-        'PASSWORD': 'inven123',
+        'USER': 'root',
+        'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '3307',
     }
 }
 
