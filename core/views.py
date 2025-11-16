@@ -15,3 +15,4 @@ class BarangListView(generics.ListAPIView):
 class LaporanKerusakanCreateView(generics.CreateAPIView):
     queryset = LaporanKerusakan.objects.all()
     serializer_class = LaporanKerusakanCreateSerializers
+    permission_classes = [permissions.AllowAny]
