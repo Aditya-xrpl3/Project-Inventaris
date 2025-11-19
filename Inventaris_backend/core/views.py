@@ -1,8 +1,9 @@
 # core/views.py
 from rest_framework import generics, permissions, filters, viewsets
-from .models import Kategori, Meja, Barang, LaporanKerusakan
+from .models import Kategori, Meja, Barang, LaporanKerusakan, JenisBarang
 from .serializers import (
     KategoriSerializer, 
+    JenisBarangSerializer,
     MejaSerializer,
     BarangSerializer, 
     LaporanKerusakanSerializer,
@@ -41,6 +42,12 @@ class KategoriViewSet(viewsets.ModelViewSet):
     queryset = Kategori.objects.all()
     serializer_class = KategoriSerializer
     permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
+
+class JenisBarangViewSet(viewsets.ModelViewSet):
+    queryset = JenisBarang.objects.all()
+    serializer_class = JenisBarangSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 
 class MejaViewSet(viewsets.ModelViewSet):
     """
