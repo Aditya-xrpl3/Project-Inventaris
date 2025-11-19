@@ -1,59 +1,50 @@
 # core/serializers.py
 from rest_framework import serializers
-from .models import Kategori, JenisBarang, Meja, Barang, LaporanKerusakan, BarangLog
+from .models import Barang, Kategori, Meja, LaporanKerusakan
 from django.contrib.auth.models import User, Group
 
+# Serializer untuk Admin mengambil daftar Kategori (untuk dropdown)
 class KategoriSerializer(serializers.ModelSerializer):
     class Meta:
         model = Kategori
-        fields = '__all__'
+        fields = '__all__' # Pakai __all__ tidak apa-apa untuk model simpel ini
 
-
-class JenisBarangSerializer(serializers.ModelSerializer):
-    kategori_detail = KategoriSerializer(source='kategori', read_only=True)
-
-    class Meta:
-        model = JenisBarang
-        fields = ['id', 'kategori', 'kategori_detail', 'nama_jenis']
-
-
+# Serializer untuk Admin mengambil daftar Meja (untuk dropdown)
 class MejaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meja
-        fields = '__all__'
+        fields = '__all__' # Pakai __all__ tidak apa-apa untuk model simpel ini
 
-
+# Serializer untuk MENAMPILKAN DAFTAR Barang (GET)
+# Ini pakai StringRelatedField agar JSON-nya cantik
 class BarangSerializer(serializers.ModelSerializer):
-    jenis_detail = JenisBarangSerializer(source='jenis', read_only=True)
-    meja_detail = MejaSerializer(source='meja', read_only=True)
+    kategori = serializers.StringRelatedField()
+    meja = serializers.StringRelatedField()
 
     class Meta:
         model = Barang
         fields = [
             'id',
-            'kode_barang',
             'nama_barang',
-            'jenis',
-            'jenis_detail',
-            'meja',
-            'meja_detail',
-            'status_barang',
-            'created_at',
-            'updated_at'
+            'kode_barang',
+            'status',
+            'kategori',
+            'meja'
         ]
 
-
-class LaporanKerusakanSerializer(serializers.ModelSerializer):
-    barang_detail = BarangSerializer(source='barang', read_only=True)
-
+# Serializer untuk MEMBUAT Laporan (POST dari ScanPage)
+# Ini HANYA minta apa yang user isi
+class LaporanKerusakanCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = LaporanKerusakan
-        fields = '__all__'
+        fields = ['meja', 'deskripsi']
 
-
-class BarangLogSerializer(serializers.ModelSerializer):
-    barang_detail = BarangSerializer(source='barang', read_only=True)
-
+# Serializer untuk MENAMPILKAN Laporan (GET untuk Admin)
+class LaporanKerusakanSerializer(serializers.ModelSerializer):
+    # Kita pakai StringRelatedField di sini agar Admin
+    # bisa lihat nama meja-nya, bukan ID
+    meja = serializers.StringRelatedField() 
+    
     class Meta:
-        model = BarangLog
+        model = LaporanKerusakan
         fields = '__all__'
