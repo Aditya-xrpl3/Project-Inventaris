@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class Kategori(models.Model):
-    nama_kategori = models.CharField(max_length=100)
+    nama_kategori = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.nama_kategori
@@ -13,14 +13,14 @@ class Kategori(models.Model):
 
 class JenisBarang(models.Model):
     kategori = models.ForeignKey(Kategori, on_delete=models.CASCADE)
-    nama_jenis = models.CharField(max_length=100)
+    nama_jenis = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.nama_jenis
 
 
 class Meja(models.Model):
-    nama_meja = models.CharField(max_length=100)
+    nama_meja = models.CharField(max_length=100, unique=True)
     lokasi = models.CharField(max_length=150)
 
     def __str__(self):
@@ -73,9 +73,22 @@ class LaporanKerusakan(models.Model):
 
 class BarangLog(models.Model):
     barang = models.ForeignKey(Barang, on_delete=models.CASCADE)
-    lokasi_awal = models.CharField(max_length=150)
-    lokasi_akhir = models.CharField(max_length=150)
+
+    lokasi_awal = models.ForeignKey(
+        Meja,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='logs_awal'
+    )
+
+    lokasi_akhir = models.ForeignKey(
+        Meja,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='logs_akhir'
+    )
+
     waktu_pindah = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Log Barang {self.barang.nama_barang}"
+        return f"Log {self.barang.nama_barang} ({self.lokasi_awal} → {self.lokasi_akhir})"
