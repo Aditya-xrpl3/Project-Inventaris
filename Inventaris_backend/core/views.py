@@ -5,70 +5,80 @@ from .serializers import (
     KategoriSerializer, 
     JenisBarangSerializer,
     MejaSerializer,
-    BarangSerializer, 
+    BarangSerializer,
+    BarangCreateUpdateSerializer,
     LaporanKerusakanSerializer,
-    LaporanKerusakanCreateSerializer # <-- Pastikan ini ada (dari file serializer)
+    LaporanKerusakanCreateSerializer
 )
 
-# --- BAGIAN 1: API PUBLIK (Dari Tim Reporting) ---
-# Ini yang dipakai oleh ScanPage.jsx (Publik & Anonim)
+# ================================================================
+#  PUBLIC API
+# ================================================================
 
 class BarangListView(generics.ListAPIView):
-    """
-    [Publik] Mengambil daftar semua barang (GET)
-    """
-    queryset = Barang.objects.all()
+    queryset = Barang.objects.select_related("jenis", "meja", "jenis__kategori")
     serializer_class = BarangSerializer
     permission_classes = [permissions.AllowAny]
+
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['nama_barang', 'kode_barang', 'meja__nama_meja', 'kategori__nama_kategori']
-    ordering_fields = ['nama_barang', 'kategori', 'status']
+
+    search_fields = [
+        "nama_barang",
+        "kode_barang",
+        "meja__nama_meja",
+        "jenis__nama_jenis",
+        "jenis__kategori__nama_kategori",
+    ]
+
+    ordering_fields = [
+        "nama_barang",
+        "kode_barang",
+        "status_barang",
+        "jenis__nama_jenis",
+        "meja__nama_meja",
+    ]
+
 
 class LaporanKerusakanCreateView(generics.CreateAPIView):
-    """
-    [Publik] Membuat laporan kerusakan baru (POST)
-    """
     queryset = LaporanKerusakan.objects.all()
-    serializer_class = LaporanKerusakanCreateSerializer # <-- Pakai resep 'Create'
+    serializer_class = LaporanKerusakanCreateSerializer
     permission_classes = [permissions.AllowAny]
 
-# --- BAGIAN 2: API ADMIN (Dari branch 'main') ---
-# Ini yang dipakai oleh AdminDashboard.jsx (Wajib Login)
+
+# ================================================================
+#  ADMIN API (JWT Required)
+# ================================================================
 
 class KategoriViewSet(viewsets.ModelViewSet):
-    """
-    [Admin] CRUD (Create, Read, Update, Delete) untuk Kategori
-    """
     queryset = Kategori.objects.all()
     serializer_class = KategoriSerializer
-    permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
+    permission_classes = [permissions.IsAuthenticated]
+
 
 class JenisBarangViewSet(viewsets.ModelViewSet):
-    queryset = JenisBarang.objects.all()
+    queryset = JenisBarang.objects.select_related("kategori")
     serializer_class = JenisBarangSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class MejaViewSet(viewsets.ModelViewSet):
-    """
-    [Admin] CRUD (Create, Read, Update, Delete) untuk Meja
-    """
     queryset = Meja.objects.all()
     serializer_class = MejaSerializer
-    permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
+    permission_classes = [permissions.IsAuthenticated]
+
 
 class BarangViewSet(viewsets.ModelViewSet):
-    """
-    [Admin] CRUD (Create, Read, Update, Delete) untuk Barang
-    """
-    queryset = Barang.objects.all()
-    serializer_class = BarangSerializer # <-- Admin bisa pakai resep ini
-    permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
+    queryset = Barang.objects.select_related("jenis", "meja")
+    permission_classes = [permissions.IsAuthenticated]
+
+    # Admin harus bisa CREATE, UPDATE FK
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update"]:
+            return BarangCreateUpdateSerializer
+        return BarangSerializer
+
 
 class LaporanKerusakanViewSet(viewsets.ModelViewSet):
-    """
-    [Admin] CRUD (Create, Read, Update, Delete) untuk Laporan
-    """
-    queryset = LaporanKerusakan.objects.all()
-    serializer_class = LaporanKerusakanSerializer # <-- Pakai resep LENGKAP
-    permission_classes = [permissions.IsAuthenticated] # <-- WAJIB LOGIN
+    queryset = LaporanKerusakan.objects.select_related("barang")
+    serializer_class = LaporanKerusakanSerializer
+    permission_classes = [permissions.IsAuthenticated]

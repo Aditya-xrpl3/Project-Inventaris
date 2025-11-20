@@ -1,36 +1,38 @@
+# core/serializers.py
 from rest_framework import serializers
 from .models import (
     Barang, Kategori, Meja, JenisBarang,
     LaporanKerusakan, BarangLog
 )
 
-# ----------- KATEGORI -----------
+# ------------------- KATEGORI -------------------
 class KategoriSerializer(serializers.ModelSerializer):
     class Meta:
         model = Kategori
         fields = '__all__'
 
 
-# ----------- JENIS BARANG -----------
+# ------------------- JENIS BARANG -------------------
 class JenisBarangSerializer(serializers.ModelSerializer):
-    kategori = serializers.StringRelatedField()
+    kategori_detail = serializers.StringRelatedField(source='kategori', read_only=True)
 
     class Meta:
         model = JenisBarang
-        fields = '__all__'
+        fields = ['id', 'nama_jenis', 'kategori', 'kategori_detail']
 
 
-# ----------- MEJA -----------
+# ------------------- MEJA -------------------
 class MejaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meja
         fields = '__all__'
 
 
-# ----------- BARANG (UNTUK ADMIN / GET) -----------
+# ------------------- BARANG (GET ONLY / public/admin) -------------------
 class BarangSerializer(serializers.ModelSerializer):
-    jenis = serializers.StringRelatedField()
-    meja = serializers.StringRelatedField()
+    jenis_detail = serializers.StringRelatedField(source='jenis')
+    meja_detail = serializers.StringRelatedField(source='meja')
+    kategori_detail = serializers.StringRelatedField(source='jenis.kategori')
 
     class Meta:
         model = Barang
@@ -39,23 +41,37 @@ class BarangSerializer(serializers.ModelSerializer):
             'kode_barang',
             'nama_barang',
             'status_barang',
-            'jenis',
-            'meja',
+            'jenis_detail',
+            'kategori_detail',
+            'meja_detail',
             'created_at',
             'updated_at'
         ]
 
 
-# ----------- LAPORAN KERUSAKAN (POST - PUBLIC) -----------
+# ------------------- BARANG (CREATE/UPDATE admin) -------------------
+class BarangCreateUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Barang
+        fields = [
+            'kode_barang',
+            'nama_barang',
+            'status_barang',
+            'jenis',
+            'meja',
+        ]
+
+
+# ------------------- LAPORAN KERUSAKAN (PUBLIC POST) -------------------
 class LaporanKerusakanCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = LaporanKerusakan
         fields = ['barang', 'deskripsi', 'foto_url']
 
 
-# ----------- LAPORAN KERUSAKAN (ADMIN - GET ALL) -----------
+# ------------------- LAPORAN KERUSAKAN (ADMIN) -------------------
 class LaporanKerusakanSerializer(serializers.ModelSerializer):
-    barang = serializers.StringRelatedField()
+    barang_detail = serializers.StringRelatedField(source='barang')
 
     class Meta:
         model = LaporanKerusakan
