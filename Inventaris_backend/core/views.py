@@ -1,85 +1,41 @@
-# core/views.py
-from rest_framework import generics, permissions, filters, viewsets
-from .models import Kategori, Meja, Barang, LaporanKerusakan, JenisBarang
-from .serializers import (
-    KategoriSerializer, 
-    JenisBarangSerializer,
-    MejaSerializer,
-    BarangSerializer,
-    BarangCreateUpdateSerializer,
-    LaporanKerusakanSerializer,
-    LaporanKerusakanCreateSerializer
-)
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
-# ================================================================
-#  PUBLIC API
-# ================================================================
+from .models import *
+from .serializers import *
 
-class BarangListView(generics.ListAPIView):
-    queryset = Barang.objects.select_related("jenis", "meja", "jenis__kategori")
-    serializer_class = BarangSerializer
-    permission_classes = [permissions.AllowAny]
-
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-
-    # ✔ search_fields valid → tidak bikin error runtime
-    search_fields = [
-        "nama_barang",
-        "kode_barang",
-        "meja__nama_meja",
-        "jenis__nama_jenis",
-        "jenis__kategori__nama_kategori",
-    ]
-
-    # ✔ ordering_fields valid → tidak error
-    ordering_fields = [
-        "nama_barang",
-        "kode_barang",
-        "status_barang",
-        "jenis__nama_jenis",
-        "meja__nama_meja",
-    ]
-
-
-class LaporanKerusakanCreateView(generics.CreateAPIView):
-    queryset = LaporanKerusakan.objects.select_related("barang")
-    serializer_class = LaporanKerusakanCreateSerializer
-    permission_classes = [permissions.AllowAny]
-
-
-# ================================================================
-#  ADMIN API
-# ================================================================
 
 class KategoriViewSet(viewsets.ModelViewSet):
     queryset = Kategori.objects.all()
     serializer_class = KategoriSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class JenisBarangViewSet(viewsets.ModelViewSet):
-    queryset = JenisBarang.objects.select_related("kategori")
+    queryset = JenisBarang.objects.select_related('kategori').all()
     serializer_class = JenisBarangSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class MejaViewSet(viewsets.ModelViewSet):
     queryset = Meja.objects.all()
     serializer_class = MejaSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
 
 class BarangViewSet(viewsets.ModelViewSet):
-    queryset = Barang.objects.select_related("jenis", "meja")
-    permission_classes = [permissions.IsAuthenticated]
+    queryset = Barang.objects.select_related('jenis', 'meja').all()
+    serializer_class = BarangSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get_serializer_class(self):
-        if self.action in ["create", "update", "partial_update"]:
-            return BarangCreateUpdateSerializer
-        return BarangSerializer
+
+class BarangLogViewSet(viewsets.ModelViewSet):
+    queryset = BarangLog.objects.all()
+    serializer_class = BarangLogSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class LaporanKerusakanViewSet(viewsets.ModelViewSet):
-    queryset = LaporanKerusakan.objects.select_related("barang")
+    queryset = LaporanKerusakan.objects.all()
     serializer_class = LaporanKerusakanSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]

@@ -84,8 +84,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'inventaris',           # harus sama dengan nama database yg dibuat
-        'USER': 'root',                 # username MySQL-mu
-        'PASSWORD': '',       # password MySQL
+        'USER': 'django',                 # username MySQL-mu
+        'PASSWORD': 'passwordku',       # password MySQL
         'HOST': 'localhost',
         'PORT': '3306',
     }
