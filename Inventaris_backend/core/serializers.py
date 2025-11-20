@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from .models import (
     Barang, Kategori, Meja, JenisBarang,
-    LaporanKerusakan, BarangLog
+    LaporanKerusakan
 )
 
 # ------------------- KATEGORI -------------------
@@ -28,7 +28,7 @@ class MejaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# ------------------- BARANG (GET ONLY / public/admin) -------------------
+# ------------------- BARANG (GET ONLY) -------------------
 class BarangSerializer(serializers.ModelSerializer):
     jenis_detail = serializers.StringRelatedField(source='jenis')
     meja_detail = serializers.StringRelatedField(source='meja')
@@ -49,8 +49,9 @@ class BarangSerializer(serializers.ModelSerializer):
         ]
 
 
-# ------------------- BARANG (CREATE/UPDATE admin) -------------------
+# ------------------- BARANG (CREATE/UPDATE) -------------------
 class BarangCreateUpdateSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Barang
         fields = [
@@ -61,15 +62,33 @@ class BarangCreateUpdateSerializer(serializers.ModelSerializer):
             'meja',
         ]
 
+    def validate(self, attrs):
+        """
+        Supaya admin tidak bisa memasukkan FK yang tidak ada.
+        Ini silent bug di versi tim reporting.
+        """
+        if not JenisBarang.objects.filter(id=attrs['jenis'].id).exists():
+            raise serializers.ValidationError("JenisBarang tidak ditemukan.")
 
-# ------------------- LAPORAN KERUSAKAN (PUBLIC POST) -------------------
+        if not Meja.objects.filter(id=attrs['meja'].id).exists():
+            raise serializers.ValidationError("Meja tidak ditemukan.")
+
+        return attrs
+
+
+# ------------------- LAPORAN (PUBLIC POST) -------------------
 class LaporanKerusakanCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = LaporanKerusakan
         fields = ['barang', 'deskripsi', 'foto_url']
 
+    def validate_barang(self, value):
+        if not Barang.objects.filter(id=value.id).exists():
+            raise serializers.ValidationError("Barang tidak ditemukan.")
+        return value
 
-# ------------------- LAPORAN KERUSAKAN (ADMIN) -------------------
+
+# ------------------- LAPORAN (ADMIN VIEW) -------------------
 class LaporanKerusakanSerializer(serializers.ModelSerializer):
     barang_detail = serializers.StringRelatedField(source='barang')
 
