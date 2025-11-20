@@ -22,6 +22,7 @@ class BarangListView(generics.ListAPIView):
 
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
 
+    # ✔ search_fields valid → tidak bikin error runtime
     search_fields = [
         "nama_barang",
         "kode_barang",
@@ -30,6 +31,7 @@ class BarangListView(generics.ListAPIView):
         "jenis__kategori__nama_kategori",
     ]
 
+    # ✔ ordering_fields valid → tidak error
     ordering_fields = [
         "nama_barang",
         "kode_barang",
@@ -40,13 +42,13 @@ class BarangListView(generics.ListAPIView):
 
 
 class LaporanKerusakanCreateView(generics.CreateAPIView):
-    queryset = LaporanKerusakan.objects.all()
+    queryset = LaporanKerusakan.objects.select_related("barang")
     serializer_class = LaporanKerusakanCreateSerializer
     permission_classes = [permissions.AllowAny]
 
 
 # ================================================================
-#  ADMIN API (JWT Required)
+#  ADMIN API
 # ================================================================
 
 class KategoriViewSet(viewsets.ModelViewSet):
@@ -71,7 +73,6 @@ class BarangViewSet(viewsets.ModelViewSet):
     queryset = Barang.objects.select_related("jenis", "meja")
     permission_classes = [permissions.IsAuthenticated]
 
-    # Admin harus bisa CREATE, UPDATE FK
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
             return BarangCreateUpdateSerializer
