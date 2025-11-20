@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import pymysql
+pymysql.install_as_MySQLdb()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,13 +83,15 @@ WSGI_APPLICATION = 'inventaris_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inventaris_db',
-        'USER': 'root',
-        'PASSWORD': '',
+        'NAME': 'inventaris',           # harus sama dengan nama database yg dibuat
+        'USER': 'django',                 # username MySQL-mu
+        'PASSWORD': 'passwordku',       # password MySQL
         'HOST': 'localhost',
-        'PORT': '3307',
+        'PORT': '3306',
     }
 }
+
+
 
 
 # Password validation
