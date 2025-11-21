@@ -153,8 +153,8 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # Token berlaku 1 jam
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Token refresh berlaku 1 hari
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30), # Token berlaku 1 jam
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Token refresh berlaku 1 hari
 }
 
 # --- Konfigurasi CORS Headers ---
