@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import pymysql
 pymysql.install_as_MySQLdb()
+import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -91,7 +92,9 @@ DATABASES = {
     }
 }
 
-
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 
 # Password validation
@@ -167,3 +170,5 @@ CORS_ALLOW_ALL_ORIGINS = True
 #     "http://localhost:3000",  # Alamat frontend React (CRA)
 #     "http://127.0.0.1:5173",
 # ]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
