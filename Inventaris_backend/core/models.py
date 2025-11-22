@@ -77,7 +77,7 @@ class LaporanKerusakan(models.Model):
 
     barang = models.ForeignKey(Barang, on_delete=models.CASCADE)
     deskripsi = models.TextField()
-    foto_url = models.CharField(max_length=255, null=True, blank=True)
+    foto_url = models.ImageField(upload_to='laporan_image/', null=True, blank=True)
     status_laporan = models.CharField(
         max_length=20,
         choices=Status.choices,
