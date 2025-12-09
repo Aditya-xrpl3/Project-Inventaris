@@ -3,28 +3,74 @@ import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App.jsx';
 import LoginPage from './pages/LoginPage.jsx';
-import AdminDashboard from './pages/AdminDashboard.jsx';
-import ScanPage from './pages/ScanPage.jsx';
-import NotFound from './pages/NotFound.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+// import ScanPage from './pages/ScanPage.jsx';
+// import NotFound from './pages/NotFound.jsx';
+import './index.css'
+import BarangList from './pages/admin/BarangList.jsx';
+import TambahBarang from './pages/admin/TambahBarang.jsx';
+import EditBarang from './pages/admin/EditBarang.jsx';
+import HapusBarang from './pages/admin/HapusBarang.jsx';
+import MejaPage from './pages/admin/MejaPage.jsx';
+import MejaDetail from './pages/admin/MejaDetail.jsx';
+import KategoriPage from './pages/admin/KategoriPage.jsx';
+import LaporanPage from './pages/admin/LaporanPage.jsx';
 
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
-    errorElement: <NotFount />,
+    // errorElement: <NotFound />,
     children: [
       {
         path: "/login",
         element: <LoginPage />
       },
       {
-        path: "/scan",
-        element: <ScanPage />
+        path: "/register",
+        element: <RegisterPage />
       },
+      // {
+      //   path: "/scan",
+      //   element: <ScanPage />
+      // },
       {
         path: "/admin",
         element: <AdminDashboard />
+      },
+      {
+        path: "/barang",
+        element: <BarangList/>
+      },
+      {
+        path: "/edit/:id",
+        element: <EditBarang/>
+      },
+      {
+        path: "/hapus/:id",
+        element: <HapusBarang/>
+      },
+      {
+        path: "/tambah",
+        element: <TambahBarang/>
+      },
+      {
+        path: "/kategori",
+        element: <KategoriPage/>
+      },
+      {
+        path: "/meja",
+        element: <MejaPage/>
+      },
+      {
+        path: "/meja/:id",
+        element: <MejaDetail/>
+      },
+      {
+        path: "/laporan",
+        element: <LaporanPage/>
       },
     ],
   },
