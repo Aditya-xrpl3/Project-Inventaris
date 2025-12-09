@@ -1,11 +1,10 @@
-// src/api.js
+// src/api/api.js
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000", // sesuaikan dengan backend Django kamu
+  baseURL: "http://localhost:8000/", // pastikan trailing slash di baseURL tidak hilang
 });
 
-// Interceptor: otomatis kirim token ke backend
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
