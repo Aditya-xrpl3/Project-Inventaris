@@ -7,31 +7,33 @@ export default function HapusBarang() {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/api/barang/${id}/`); // <- pastikan prefix /api/ sesuai API docs
-      navigate("/barang"); // kembali ke daftar barang
+      await api.delete(`/api/barang/${id}/`);
+      navigate("/barang");
     } catch (err) {
-      console.error("Gagal hapus:", err);
+      console.error(err);
     }
   };
 
   return (
-    <div className="p-6 max-w-lg mx-auto bg-white shadow rounded">
-      <h1 className="text-xl font-bold mb-4">Hapus Barang</h1>
-      <p className="mb-4">Yakin ingin menghapus barang ini?</p>
+    <div className="p-6 max-w-lg mx-auto">
+      <div className="bg-white shadow-lg rounded-xl p-6 space-y-4">
+        <h1 className="text-xl font-bold text-gray-800">Hapus Barang</h1>
+        <p className="text-gray-700">Yakin ingin menghapus barang ini?</p>
 
-      <div className="flex gap-3">
-        <button
-          onClick={handleDelete}
-          className="bg-red-600 text-white px-4 py-2 rounded"
-        >
-          Ya, Hapus
-        </button>
-        <button
-          onClick={() => navigate("/barang")}
-          className="bg-gray-500 text-white px-4 py-2 rounded"
-        >
-          Batal
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={handleDelete}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow"
+          >
+            Ya, Hapus
+          </button>
+          <button
+            onClick={() => navigate("/barang")}
+            className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg shadow"
+          >
+            Batal
+          </button>
+        </div>
       </div>
     </div>
   );

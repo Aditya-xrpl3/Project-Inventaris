@@ -1,3 +1,4 @@
+// src/pages/admin/AdminDashboard.jsx
 import { useEffect, useState } from "react";
 import { Home, Boxes, FileText, Tag, MonitorCog, LogOut } from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
@@ -47,55 +48,64 @@ export default function AdminDashboard() {
     { name: "Meja", icon: <MonitorCog size={18} />, url: "/meja" },
   ];
 
-  const Card = ({ label, value, color }) => (
-    <div className={`p-5 rounded-lg shadow bg-${color}-100 border-l-4 border-${color}-500`}>
-      <p className="text-gray-600">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
+  // Modern card component
+  const Card = ({ label, value, color, icon }) => (
+    <div className={`flex items-center gap-4 p-5 rounded-xl shadow-md bg-${color}-50 border-l-4 border-${color}-500 transition-transform hover:scale-105`}>
+      <div className={`p-3 rounded-full bg-${color}-200/50 text-${color}-600`}>
+        {icon}
+      </div>
+      <div>
+        <p className="text-gray-500 text-sm">{label}</p>
+        <p className="text-2xl font-bold">{value}</p>
+      </div>
     </div>
   );
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <div className="w-60 bg-slate-800 text-white p-4">
-        <h1 className="text-xl font-bold mb-6 text-center">Inventaris Lab</h1>
-        <ul>
-          {menu.map((m, i) => (
-            <li key={i} className="mb-2">
-              <NavLink
-                to={m.url}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 p-2 rounded-md ${isActive ? "bg-blue-600" : "hover:bg-slate-700"}`
-                }
-              >
-                {m.icon} {m.name}
-              </NavLink>
-            </li>
+      <aside className="w-64 bg-slate-900 text-white p-5 flex flex-col">
+        <h1 className="text-2xl font-bold mb-10 text-center">Inventaris Lab</h1>
+
+        <nav className="flex-1">
+          {menu.map((m) => (
+            <NavLink
+              key={m.name}
+              to={m.url}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-2 rounded-lg mb-2 transition-colors ${
+                  isActive ? "bg-blue-600" : "hover:bg-slate-700"
+                }`
+              }
+            >
+              {m.icon} <span>{m.name}</span>
+            </NavLink>
           ))}
-        </ul>
+        </nav>
 
         <button
           onClick={logout}
-          className="flex items-center gap-2 p-2 w-full mt-10 bg-red-600 hover:bg-red-700 rounded-md"
+          className="mt-auto flex items-center gap-3 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
         >
           <LogOut size={18} /> Logout
         </button>
-      </div>
+      </aside>
 
-      {/* Konten utama */}
-      <div className="flex-1 bg-gray-100 p-6">
-        <h1 className="text-2xl font-bold mb-6">Dashboard Admin</h1>
+      {/* Main Content */}
+      <main className="flex-1 p-8">
+        <h1 className="text-3xl font-semibold mb-8">Dashboard Admin</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card label="Total Barang" value={stats.barang} color="blue" />
-          <Card label="Total Meja" value={stats.meja} color="green" />
-          <Card label="Laporan Pending" value={stats.pending} color="yellow" />
-          <Card label="Laporan Selesai" value={stats.selesai} color="purple" />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+          <Card label="Total Barang" value={stats.barang} color="blue" icon={<Boxes size={24} />} />
+          <Card label="Total Meja" value={stats.meja} color="green" icon={<MonitorCog size={24} />} />
+          <Card label="Laporan Pending" value={stats.pending} color="yellow" icon={<FileText size={24} />} />
+          <Card label="Laporan Selesai" value={stats.selesai} color="purple" icon={<Tag size={24} />} />
         </div>
 
-        {/* Halaman child admin (barang, laporan, meja, kategori) */}
+        {/* Halaman child admin */}
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 }

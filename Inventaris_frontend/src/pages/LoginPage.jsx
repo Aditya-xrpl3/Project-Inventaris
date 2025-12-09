@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/api"; // axios dengan interceptor (auto token)
+import api from "../api/api";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -9,77 +9,89 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await api.post("auth/login/", {
-      username,
-      password,
-    });
+    e.preventDefault();
+    try {
+      const res = await api.post("auth/login/", { username, password });
 
-    // Simpan access & refresh token
-    localStorage.setItem("token", res.data.access);         // access token dipakai untuk header Authorization
-    localStorage.setItem("refresh_token", res.data.refresh); // refresh token bisa pakai untuk auto-refresh nanti
+      localStorage.setItem("token", res.data.access);
+      localStorage.setItem("refresh_token", res.data.refresh);
 
-    navigate("/admin");
-  } catch (err) {
-    setErrorMsg("Login Gagal! ID atau Password salah.");
-  }
-};
-
+      navigate("/admin");
+    } catch (err) {
+      setErrorMsg("Login Gagal! ID atau Password salah.");
+    }
+  };
 
   const handleCancel = () => {
-    setIdAdmin("");
+    setUsername("");
     setPassword("");
+    setErrorMsg("");
   };
 
   return (
     <div
-      className="min-h-screen flex justify-center items-center bg-cover bg-center"
+      className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
       style={{
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1596495578065-9a3f1ff1718e?q=80&w=1200')",
+          "url(/public/image/bg1.png)",
       }}
     >
-      <div className="bg-white/90 w-[380px] p-7 rounded-xl shadow-2xl border border-green-200 backdrop-blur">
-        <h1 className="text-center text-2xl font-bold mb-6 text-gray-800">
+      {/* Overlay gelap semi transparan */}
+      <div className="absolute inset-0 bg-black opacity-60"></div>
+
+      {/* Form card */}
+      <div className="relative bg-white rounded-2xl shadow-xl w-[400px] p-8 z-10 border border-green-300">
+        <h1 className="text-center text-3xl font-semibold text-gray-900 mb-6">
           Login Admin
         </h1>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm text-blue-700 mb-1">ID Admin</label>
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-green-700 mb-1"
+            >
+              ID Admin
+            </label>
             <input
+              id="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
               placeholder="Masukkan ID Admin"
               required
+              className="w-full px-4 py-2 rounded-md border border-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Password</label>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-green-700 mb-1"
+            >
+              Password
+            </label>
             <input
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-green-500 focus:outline-none"
               placeholder="Masukkan Password"
               required
+              className="w-full px-4 py-2 rounded-md border border-green-300 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
 
           {errorMsg && (
-            <p className="text-center text-red-600 text-sm font-medium">
+            <p className="text-center text-sm text-red-600 font-medium">
               {errorMsg}
             </p>
           )}
 
-          <div className="flex justify-between mt-4">
+          <div className="flex justify-between mt-6">
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
+              className="flex-grow mr-2 bg-green-600 text-white font-semibold py-2 rounded-lg hover:bg-green-700 transition"
             >
               Login
             </button>
@@ -87,9 +99,9 @@ export default function Login() {
             <button
               type="button"
               onClick={handleCancel}
-              className="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700"
+              className="flex-grow ml-2 bg-gray-300 text-gray-700 font-semibold py-2 rounded-lg hover:bg-gray-400 transition"
             >
-              X Cancel
+              Cancel
             </button>
           </div>
         </form>
