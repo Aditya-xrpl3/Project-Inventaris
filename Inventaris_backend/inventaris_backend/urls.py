@@ -11,20 +11,26 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path("admin/", admin.site.urls),
 
-    # 🔐 AUTH (JWT & login)
+    # 🔐 AUTH
     path("auth/", include("auth.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
-    # ✅ API CORE (BARANG, MEJA, DLL)
+    # ✅ API CORE
     path("api/", include("core.urls")),
 
-    # 🌐 REACT FRONTEND
+    # 🌐 REACT FRONTEND (Akses root langsung ke index.html)
     path("", TemplateView.as_view(template_name="index.html")),
 ]
 
+# --- KONFIGURASI PENTING ---
 if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT
-    )
+    # 1. Melayani File Media (QR Code, Uploads) -> URL: /media/...
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
+    # 2. Melayani File Static (Vite Assets) -> URL: /assets/...
+    # Ini memastikan Django bisa baca file CSS/JS dari folder frontend_build
+    try:
+        urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+    except Exception as e:
+        print("Warning: STATICFILES_DIRS mungkin kosong atau belum di-build.", e)
