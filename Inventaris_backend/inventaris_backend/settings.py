@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-gc0o9^=ue6x!2tto^^5@omwv=hr3q+iu-8hz704yvw!x+uu_8m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '9e250ce25d34.ngrok-free.app']
 
 
 # Application definition
@@ -63,7 +63,7 @@ ROOT_URLCONF = 'inventaris_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'frontend_build'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,7 +131,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/assets/'  # supaya URL /assets/... cocok dengan Vite
+STATICFILES_DIRS = [BASE_DIR / 'frontend_build' / 'assets']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -165,10 +166,21 @@ SIMPLE_JWT = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 # Nanti saat production, ganti dengan ini agar lebih aman:
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:5173",  # Alamat frontend React (Vite)
-#     "http://localhost:3000",  # Alamat frontend React (CRA)
-#     "http://127.0.0.1:5173",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Alamat frontend React (Vite)
+    "http://localhost:3000",  # Alamat frontend React (CRA)
+    "http://127.0.0.1:5173",
+]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+FRONTEND_URL = "http://localhost:5173/"
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-csrftoken",
+    "accept",
+    "origin",
+    "user-agent",
+]
+
+

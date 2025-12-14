@@ -44,6 +44,7 @@ class Barang(models.Model):
 
     # Barang harus punya lokasi → NOT NULL
     meja = models.ForeignKey(Meja, on_delete=models.SET_NULL, null=True)
+    qr_image = models.ImageField(upload_to='qr_codes/barang/', null=True, blank=True)
 
     status_barang = models.CharField(
         max_length=20,

@@ -1,4 +1,3 @@
-// src/pages/admin/AdminDashboard.jsx
 import { useEffect, useState } from "react";
 import { Home, Boxes, FileText, Tag, MonitorCog, LogOut } from "lucide-react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
@@ -13,13 +12,16 @@ export default function AdminDashboard() {
     selesai: 0,
   });
 
-  // Fetch stats dashboard
+  const [latestBarang, setLatestBarang] = useState([]);
+
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchStatsAndBarang = async () => {
       try {
-        const barangRes = await api.get("/api/barang/");
-        const mejaRes = await api.get("/api/meja/");
-        const laporanRes = await api.get("/api/laporan/");
+        const [barangRes, mejaRes, laporanRes] = await Promise.all([
+          api.get("/api/barang/"),
+          api.get("/api/meja/"),
+          api.get("/api/laporan/"),
+        ]);
 
         setStats({
           barang: barangRes.data.length,
@@ -27,12 +29,19 @@ export default function AdminDashboard() {
           pending: laporanRes.data.filter((l) => l.status_laporan === "pending").length,
           selesai: laporanRes.data.filter((l) => l.status_laporan === "selesai").length,
         });
+
+        // Sort barang berdasarkan waktu dibuat terbaru (pastikan backend mengirim created_at)
+        const sortedBarang = barangRes.data
+          .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+          .slice(0, 5);
+
+        setLatestBarang(sortedBarang);
       } catch (err) {
         console.error("Gagal load dashboard:", err);
       }
     };
 
-    fetchStats();
+    fetchStatsAndBarang();
   }, []);
 
   const logout = () => {
@@ -48,12 +57,12 @@ export default function AdminDashboard() {
     { name: "Meja", icon: <MonitorCog size={18} />, url: "/meja" },
   ];
 
-  // Modern card component
+  // Modern card component with dynamic bg and border colors
   const Card = ({ label, value, color, icon }) => (
-    <div className={`flex items-center gap-4 p-5 rounded-xl shadow-md bg-${color}-50 border-l-4 border-${color}-500 transition-transform hover:scale-105`}>
-      <div className={`p-3 rounded-full bg-${color}-200/50 text-${color}-600`}>
-        {icon}
-      </div>
+    <div
+      className={`flex items-center gap-4 p-5 rounded-xl shadow-md bg-${color}-50 border-l-4 border-${color}-500 transition-transform hover:scale-105 cursor-default`}
+    >
+      <div className={`p-3 rounded-full bg-${color}-200/50 text-${color}-600`}>{icon}</div>
       <div>
         <p className="text-gray-500 text-sm">{label}</p>
         <p className="text-2xl font-bold">{value}</p>
@@ -92,7 +101,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 overflow-auto">
         <h1 className="text-3xl font-semibold mb-8">Dashboard Admin</h1>
 
         {/* Stats Cards */}
@@ -103,7 +112,40 @@ export default function AdminDashboard() {
           <Card label="Laporan Selesai" value={stats.selesai} color="purple" icon={<Tag size={24} />} />
         </div>
 
-        {/* Halaman child admin */}
+        {/* Daftar barang terbaru */}
+        <section>
+          <h2 className="text-xl font-semibold mb-4">Barang Terbaru</h2>
+          {latestBarang.length === 0 ? (
+            <p className="text-gray-600">Tidak ada barang terbaru</p>
+          ) : (
+            <table className="w-full border-collapse shadow rounded-lg overflow-hidden">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="text-left p-3">Kode</th>
+                  <th className="text-left p-3">Nama</th>
+                  <th className="text-left p-3">Status</th>
+                  <th className="text-left p-3">Meja</th>
+                </tr>
+              </thead>
+              <tbody>
+                {latestBarang.map((b) => (
+                  <tr
+                    key={b.id}
+                    className="border-t hover:bg-gray-100 cursor-pointer"
+                    onClick={() => navigate(`/admin/barang/${b.id}`)}
+                  >
+                    <td className="p-3">{b.kode_barang}</td>
+                    <td className="p-3">{b.nama_barang}</td>
+                    <td className="p-3 capitalize">{b.status_barang}</td>
+                    <td className="p-3">{b.meja_nama ?? b.meja}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </section>
+
+        {/* Halaman child admin jika ada */}
         <Outlet />
       </main>
     </div>
