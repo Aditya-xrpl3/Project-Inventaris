@@ -1,6 +1,7 @@
-# core/serializers.py
 from rest_framework import serializers
 from .models import Kategori, JenisBarang, Meja, Barang, BarangLog, LaporanKerusakan
+
+# --- MASTER DATA ---
 
 class KategoriSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,7 +9,8 @@ class KategoriSerializer(serializers.ModelSerializer):
         fields = ['id', 'nama_kategori']
 
 class JenisBarangSerializer(serializers.ModelSerializer):
-    kategori = serializers.StringRelatedField()
+    # StringRelatedField akan mengambil return __str__ dari model Kategori
+    kategori = serializers.StringRelatedField() 
 
     class Meta:
         model = JenisBarang
@@ -19,53 +21,31 @@ class MejaSerializer(serializers.ModelSerializer):
         model = Meja
         fields = ['id', 'nama_meja', 'lokasi']
 
+# --- BARANG ---
 
-# Minimal barang representation for embedding in Meja detail
-class BarangSimpleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Barang
-        fields = ['id', 'nama_barang', 'status_barang']
-
-
-class MejaDetailSerializer(serializers.ModelSerializer):
-    barang_set = BarangSimpleSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Meja
-        fields = ['id', 'nama_meja', 'lokasi', 'barang_set']
-
-# --- Barang (output format A) ---
+# Serializer untuk Read (GET) - Menampilkan detail lengkap (bukan cuma ID)
 class BarangSerializer(serializers.ModelSerializer):
     qr_image = serializers.ImageField(read_only=True)
-    jenis = serializers.SerializerMethodField()
-    meja = serializers.SerializerMethodField()
+    jenis_detail = serializers.SerializerMethodField() # Custom field biar rapi
+    meja_detail = serializers.SerializerMethodField()
 
     class Meta:
         model = Barang
         fields = [
-            'id',
-            'kode_barang',
-            'nama_barang',
-            'jenis',
-            'meja',
-            'status_barang',
-            'qr_image',
-            'created_at',
-            'updated_at',
+            'id', 'kode_barang', 'nama_barang', 
+            'jenis', 'jenis_detail',  # Tampilkan ID dan Detail
+            'meja', 'meja_detail', 
+            'status_barang', 'qr_image', 
+            'created_at', 'updated_at'
         ]
 
-    def get_jenis(self, obj):
-        # Format: "Kategori - Nama Jenis"
-        if obj.jenis:
-            return f"{obj.jenis.kategori.nama_kategori} - {obj.jenis.nama_jenis}"
-        return None
+    def get_jenis_detail(self, obj):
+        return f"{obj.jenis.kategori.nama_kategori} - {obj.jenis.nama_jenis}" if obj.jenis else "-"
 
-    def get_meja(self, obj):
-        if obj.meja:
-            return f"{obj.meja.nama_meja} ({obj.meja.lokasi})"
-        return None
+    def get_meja_detail(self, obj):
+        return f"{obj.meja.nama_meja} ({obj.meja.lokasi})" if obj.meja else "Gudang / Tidak Ada"
 
-# --- Serializer untuk create/update Barang (admin only) ---
+# Serializer untuk Write (POST/PUT) - Menerima ID
 class BarangCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Barang
@@ -73,13 +53,13 @@ class BarangCreateUpdateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """
-        Setelah create/update, return full detail barang
-        menggunakan BarangSerializer.
+        Setelah berhasil save, response balikan akan menggunakan format lengkap (BarangSerializer)
+        bukan cuma ID saja. Ini bagus untuk UX frontend.
         """
-        from .serializers import BarangSerializer
         return BarangSerializer(instance).data
 
-# --- BarangLog serializer (read only) ---
+# --- LOG & LAPORAN ---
+
 class BarangLogSerializer(serializers.ModelSerializer):
     barang = serializers.StringRelatedField()
     lokasi_awal = serializers.StringRelatedField()
@@ -90,10 +70,7 @@ class BarangLogSerializer(serializers.ModelSerializer):
         model = BarangLog
         fields = ['id', 'barang', 'lokasi_awal', 'lokasi_akhir', 'waktu_pindah', 'user']
 
-# --- LaporanKerusakan ---
-
 class LaporanKerusakanCreateSerializer(serializers.ModelSerializer):
-    # Buat foto_url opsional
     foto_url = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
@@ -102,60 +79,21 @@ class LaporanKerusakanCreateSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         barang = data.get('barang')
-        # Jika sudah ada laporan pending, tolak
-        existing = LaporanKerusakan.objects.filter(
-            barang=barang, 
-            status_laporan=LaporanKerusakan.Status.PENDING
-        )
-        if existing.exists():
-            raise serializers.ValidationError(
-                "Sudah ada laporan pending untuk barang ini. Tunggu tindak lanjut admin."
-            )
+        if LaporanKerusakan.objects.filter(barang=barang, status_laporan='pending').exists():
+            raise serializers.ValidationError("Sudah ada laporan pending untuk barang ini.")
         return data
 
-
 class LaporanKerusakanSerializer(serializers.ModelSerializer):
-    # Admin/read serializers should include nested barang and pelapor info
-    barang_detail = serializers.SerializerMethodField(read_only=True)
-    pelapor = serializers.SerializerMethodField(read_only=True)
+    barang_detail = serializers.SerializerMethodField()
+    pelapor = serializers.SerializerMethodField()
 
     class Meta:
         model = LaporanKerusakan
-        fields = [
-            'id', 'barang', 'deskripsi', 'foto_url', 'status_laporan',
-            'user', 'created_at', 'updated_at', 'barang_detail', 'pelapor'
-        ]
+        fields = '__all__'
         read_only_fields = ('user',)
 
-    def validate(self, data):
-        barang = data.get("barang")
-
-        # Cek jika masih ada laporan pending untuk barang ini
-        if LaporanKerusakan.objects.filter(
-            barang=barang, 
-            status_laporan=LaporanKerusakan.Status.PENDING
-        ).exists():
-            raise serializers.ValidationError(
-                {"barang": "Barang ini sudah memiliki laporan pending. Tunggu admin."}
-            )
-        return data
-
-    def create(self, validated_data):
-        # Anonymous: user = None
-        user = None
-        if self.context['request'].user.is_authenticated:
-            user = self.context['request'].user
-
-        validated_data['user'] = user
-        return super().create(validated_data)
-
     def get_barang_detail(self, obj):
-        return {
-            'id': obj.barang.id,
-            'nama_barang': obj.barang.nama_barang
-        } if obj.barang else None
+        return {'id': obj.barang.id, 'nama_barang': obj.barang.nama_barang} if obj.barang else None
 
     def get_pelapor(self, obj):
-        if obj.user:
-            return {'id': obj.user.id, 'username': obj.user.username}
-        return None
+        return {'id': obj.user.id, 'username': obj.user.username} if obj.user else None
