@@ -89,7 +89,7 @@ export default function TambahBarang() {
               <option value="">Pilih Kategori</option>
               {kategori.map((k) => (
                 <option key={k.id} value={k.id}>
-                  {k.nama}
+                  {k.nama_kategori}
                 </option>
               ))}
             </select>

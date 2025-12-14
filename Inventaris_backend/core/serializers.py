@@ -36,6 +36,7 @@ class MejaDetailSerializer(serializers.ModelSerializer):
 
 # --- Barang (output format A) ---
 class BarangSerializer(serializers.ModelSerializer):
+    qr_image = serializers.ImageField(read_only=True)
     jenis = serializers.SerializerMethodField()
     meja = serializers.SerializerMethodField()
 
@@ -48,6 +49,7 @@ class BarangSerializer(serializers.ModelSerializer):
             'jenis',
             'meja',
             'status_barang',
+            'qr_image',
             'created_at',
             'updated_at',
         ]
@@ -69,6 +71,14 @@ class BarangCreateUpdateSerializer(serializers.ModelSerializer):
         model = Barang
         fields = ['kode_barang', 'nama_barang', 'jenis', 'meja', 'status_barang']
 
+    def to_representation(self, instance):
+        """
+        Setelah create/update, return full detail barang
+        menggunakan BarangSerializer.
+        """
+        from .serializers import BarangSerializer
+        return BarangSerializer(instance).data
+
 # --- BarangLog serializer (read only) ---
 class BarangLogSerializer(serializers.ModelSerializer):
     barang = serializers.StringRelatedField()
@@ -81,18 +91,26 @@ class BarangLogSerializer(serializers.ModelSerializer):
         fields = ['id', 'barang', 'lokasi_awal', 'lokasi_akhir', 'waktu_pindah', 'user']
 
 # --- LaporanKerusakan ---
+
 class LaporanKerusakanCreateSerializer(serializers.ModelSerializer):
-    # anonymous create -> user will be left null automatically
+    # Buat foto_url opsional
+    foto_url = serializers.ImageField(required=False, allow_null=True)
+
     class Meta:
         model = LaporanKerusakan
         fields = ['barang', 'deskripsi', 'foto_url']
 
     def validate(self, data):
         barang = data.get('barang')
-        # If there is already a pending report for this barang, reject creation
-        existing = LaporanKerusakan.objects.filter(barang=barang, status_laporan=LaporanKerusakan.Status.PENDING)
+        # Jika sudah ada laporan pending, tolak
+        existing = LaporanKerusakan.objects.filter(
+            barang=barang, 
+            status_laporan=LaporanKerusakan.Status.PENDING
+        )
         if existing.exists():
-            raise serializers.ValidationError("Sudah ada laporan pending untuk barang ini. Tunggu tindak lanjut admin.")
+            raise serializers.ValidationError(
+                "Sudah ada laporan pending untuk barang ini. Tunggu tindak lanjut admin."
+            )
         return data
 
 

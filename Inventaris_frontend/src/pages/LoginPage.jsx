@@ -11,12 +11,12 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("auth/login/", { username, password });
+      const res = await api.post("api/token/", { username, password });
 
       localStorage.setItem("token", res.data.access);
-      localStorage.setItem("refresh_token", res.data.refresh);
+      localStorage.setItem("refresh_token", res.data.refresh); // Pastikan disimpan
 
-      navigate("/admin");
+      navigate("/dashboard");
     } catch (err) {
       setErrorMsg("Login Gagal! ID atau Password salah.");
     }
@@ -32,8 +32,7 @@ export default function Login() {
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
       style={{
-        backgroundImage:
-          "url(/public/image/bg1.png)",
+        backgroundImage: "url(/public/image/bg1.png)",
       }}
     >
       {/* Overlay gelap semi transparan */}

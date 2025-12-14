@@ -5,8 +5,10 @@ import App from './App.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
-// import ScanPage from './pages/ScanPage.jsx';
-// import NotFound from './pages/NotFound.jsx';
+import ScanPage from './pages/user/ScanPage.jsx';
+// import NotFound from './pages/user/NotFound.jsx';
+import BarangDetail from './pages/user/BarangDetail.jsx';
+import LaporBarang from './pages/user/LaporBarang.jsx';
 import './index.css'
 import BarangList from './pages/admin/BarangList.jsx';
 import TambahBarang from './pages/admin/TambahBarang.jsx';
@@ -32,12 +34,12 @@ const router = createBrowserRouter([
         path: "/register",
         element: <RegisterPage />
       },
-      // {
-      //   path: "/scan",
-      //   element: <ScanPage />
-      // },
       {
-        path: "/admin",
+        path: "/",
+        element: <ScanPage />
+      },
+      {
+        path: "/dashboard",
         element: <AdminDashboard />
       },
       {
@@ -71,6 +73,14 @@ const router = createBrowserRouter([
       {
         path: "/laporan",
         element: <LaporanPage/>
+      },
+      {
+        path: "/lapor/:id",
+        element: <LaporBarang/>
+      },
+      {
+        path: "/detail/:id",
+        element: <BarangDetail/>
       },
     ],
   },
