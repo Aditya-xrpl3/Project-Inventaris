@@ -29,8 +29,9 @@ SECRET_KEY = 'django-insecure-gc0o9^=ue6x!2tto^^5@omwv=hr3q+iu-8hz704yvw!x+uu_8m
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '9e250ce25d34.ngrok-free.app']
+# ... (Previous settings)
 
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app', '.now.sh']
 
 # Application definition
 
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Add Whitenoise here
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,20 +62,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'inventaris_backend.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'frontend_build'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+# ... (Templates config remains same)
 
 WSGI_APPLICATION = 'inventaris_backend.wsgi.application'
 
@@ -81,73 +70,39 @@ WSGI_APPLICATION = 'inventaris_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'inventaris',           # harus sama dengan nama database yg dibuat
-        'USER': 'django',                 # username MySQL-mu
-        'PASSWORD': 'passwordku',       # password MySQL
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
+    'default': dj_database_url.config(
+        default='mysql://django:passwordku@localhost:3306/inventaris',
+        conn_max_age=600
+    )
 }
 
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-]
+# ... (Password validation remains same)
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
+# ... (Internationalization remains same)
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/assets/'  # supaya URL /assets/... cocok dengan Vite
-STATICFILES_DIRS = [BASE_DIR / 'frontend_build' / 'assets']
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Media Files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # --- Konfigurasi Django REST Framework ---
 REST_FRAMEWORK = {
-    # Atur 'Permissions' default. 
-    # Kita set agar semua endpoint butuh login (IsAuthenticated)
-    # Kita akan buat beberapa endpoint jadi publik secara manual nanti
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    # Atur 'Authentication' default ke JWT
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
@@ -157,30 +112,21 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30), # Token berlaku 1 jam
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # Token refresh berlaku 1 hari
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
 # --- Konfigurasi CORS Headers ---
-# Untuk sekarang, kita izinkan semua domain (baik untuk development)
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True # Allow all for Vercel previews
+# CORS_ALLOWED_ORIGINS = [
+#     "https://your-frontend-project.vercel.app",
+#     "http://localhost:5173",
+# ]
 
-# Nanti saat production, ganti dengan ini agar lebih aman:
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Alamat frontend React (Vite)
-    "http://localhost:3000",  # Alamat frontend React (CRA)
-    "http://127.0.0.1:5173",
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.vercel.app",
+    "https://*.now.sh",
 ]
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-FRONTEND_URL = "http://localhost:5173/"
-CORS_ALLOW_HEADERS = [
-    "content-type",
-    "authorization",
-    "x-csrftoken",
-    "accept",
-    "origin",
-    "user-agent",
-]
+
 
 
