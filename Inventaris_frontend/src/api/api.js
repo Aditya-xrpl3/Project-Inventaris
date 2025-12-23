@@ -1,10 +1,15 @@
 // src/api/api.js
 import axios from "axios";
 
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+// Jika di Vercel, kita gunakan relative path "/" karena backend di-serve di domain yg sama via vercel.json
+// Jika di local (atau akses via IP HP), kita gunakan port 8000.
+const baseURL = isLocal || window.location.hostname.includes("192.168") 
+  ? `${window.location.protocol}//${window.location.hostname}:8000`
+  : "/"; 
+
 const api = axios.create({
-  // Gunakan hostname yang sama dengan frontend (agar bisa diakses dari HP via IP)
-  // Asumsi backend jalan di port 8000
-  baseURL: `${window.location.protocol}//${window.location.hostname}:8000`,
+  baseURL: baseURL,
 });
 
 // Interceptor untuk request: tambah Authorization header
@@ -29,7 +34,7 @@ api.interceptors.response.use(
       if (refreshToken) {
         try {
           const res = await axios.post(
-            "http://localhost:8000/api/token/refresh/",
+            `${baseURL}api/token/refresh/`,
             {
               refresh: refreshToken,
             }
