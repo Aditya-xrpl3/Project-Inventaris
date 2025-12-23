@@ -1,7 +1,7 @@
 {
   "builds": [
     {
-      "src": "Inventaris_backend/inventaris_backend/wsgi.py",
+      "src": "Inventaris_backend/wsgi_vercel.py",
       "use": "@vercel/python",
       "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
     },
@@ -12,11 +12,11 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "Inventaris_backend/inventaris_backend/wsgi.py" },
-    { "src": "/auth/(.*)", "dest": "Inventaris_backend/inventaris_backend/wsgi.py" },
-    { "src": "/admin/(.*)", "dest": "Inventaris_backend/inventaris_backend/wsgi.py" },
-    { "src": "/static/(.*)", "dest": "Inventaris_backend/inventaris_backend/wsgi.py" },
-    { "src": "/media/(.*)", "dest": "Inventaris_backend/inventaris_backend/wsgi.py" },
+    { "src": "/api/(.*)", "dest": "Inventaris_backend/wsgi_vercel.py" },
+    { "src": "/auth/(.*)", "dest": "Inventaris_backend/wsgi_vercel.py" },
+    { "src": "/admin/(.*)", "dest": "Inventaris_backend/wsgi_vercel.py" },
+    { "src": "/static/(.*)", "dest": "Inventaris_backend/wsgi_vercel.py" },
+    { "src": "/media/(.*)", "dest": "Inventaris_backend/wsgi_vercel.py" },
     { "src": "/(.*)", "dest": "Inventaris_frontend/$1" }
   ]
 }
