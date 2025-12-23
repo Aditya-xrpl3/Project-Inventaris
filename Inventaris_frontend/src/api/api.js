@@ -2,7 +2,9 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  // Gunakan hostname yang sama dengan frontend (agar bisa diakses dari HP via IP)
+  // Asumsi backend jalan di port 8000
+  baseURL: `${window.location.protocol}//${window.location.hostname}:8000`,
 });
 
 // Interceptor untuk request: tambah Authorization header

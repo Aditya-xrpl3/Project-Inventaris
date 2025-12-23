@@ -8,7 +8,8 @@ from .views import (
     BarangLogViewSet,
     LaporanKerusakanViewSet,
     LaporanCreateView,
-    barang_public_detail
+    barang_public_detail,
+    DashboardStatsView
 )
 
 # -------------------------
@@ -33,4 +34,5 @@ urlpatterns = [
     # Endpoint Khusus (Non-Router)
     path('lapor/', LaporanCreateView.as_view(), name='lapor-create'),
     path('barang-public/<int:pk>/', barang_public_detail, name='barang-public-detail'),
+    path('dashboard-stats/', DashboardStatsView.as_view(), name='dashboard-stats'),
 ]

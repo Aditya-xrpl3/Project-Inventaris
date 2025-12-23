@@ -1,4 +1,5 @@
 from rest_framework import viewsets, status
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view, permission_classes
@@ -13,7 +14,7 @@ from .serializers import (
     MejaSerializer, BarangSerializer, BarangCreateUpdateSerializer,
     BarangLogSerializer, LaporanKerusakanCreateSerializer, LaporanKerusakanSerializer
 )
-from .utils import generate_qr_for_barang
+from .services import QRService
 from .permissions import LaporanPermission
 
 # --- MASTER DATA VIEWSETS ---
@@ -51,8 +52,11 @@ class BarangViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         barang = serializer.save()
         # Generate QR otomatis setelah save
-        public_url = self.request.build_absolute_uri(f"/api/barang-public/{barang.id}/")
-        generate_qr_for_barang(barang, public_url)
+        public_url = self.request.build_absolute_uri(f"/barang-public/{barang.id}")
+        # Jika front end terpisah (misal localhost:5173), sebaiknya gunakan setting URL frontend
+        # Untuk saat ini kita simulasikan URL public frontend:
+        frontend_url = f"http://localhost:5173/barang-public/{barang.id}"
+        QRService.generate_qr_for_barang(barang, frontend_url)
 
     def perform_update(self, serializer):
         # Logic update lokasi & catat log
@@ -71,8 +75,9 @@ class BarangViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], url_path="regenerate_qr")
     def regenerate_qr(self, request, pk=None):
         barang = self.get_object()
-        public_url = request.build_absolute_uri(f"/api/barang-public/{barang.id}/")
-        generate_qr_for_barang(barang, public_url)
+        # Gunakan URL Frontend
+        frontend_url = f"http://localhost:5173/barang-public/{barang.id}"
+        QRService.generate_qr_for_barang(barang, frontend_url)
         return Response({"message": "QR berhasil dibuat ulang", "url": barang.qr_image.url})
 
 # --- LOG & LAPORAN ---
@@ -110,3 +115,32 @@ class LaporanKerusakanViewSet(viewsets.ModelViewSet):
         laporan.status_laporan = request.data.get("status_laporan", laporan.status_laporan)
         laporan.save()
         return Response(self.get_serializer(laporan).data)
+
+class DashboardStatsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        total_barang = Barang.objects.count()
+        barang_rusak = Barang.objects.filter(status_barang=Barang.Status.RUSAK).count()
+        barang_tersedia = Barang.objects.filter(status_barang=Barang.Status.TERSEDIA).count()
+
+        # Ambil 5 laporan terbaru
+        recent_laporan_qs = LaporanKerusakan.objects.select_related('barang').order_by('-created_at')[:5]
+        # Manual serialize simpe saja untuk dashboard
+        recent_laporan = []
+        for lap in recent_laporan_qs:
+            recent_laporan.append({
+                "id": lap.id,
+                "barang_nama": lap.barang.nama_barang,
+                "deskripsi": lap.deskripsi,
+                "status": lap.status_laporan,
+                "created_at": lap.created_at,
+                "lokasi": lap.barang.meja.nama_meja if lap.barang.meja else "Gudang"
+            })
+
+        return Response({
+            "total_barang": total_barang,
+            "barang_rusak": barang_rusak,
+            "barang_tersedia": barang_tersedia,
+            "recent_laporan": recent_laporan
+        })
