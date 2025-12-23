@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from .utils import generate_qr_for_barang # Pastikan file utils.py ada dan benar
+
 
 User = get_user_model()
 
@@ -40,24 +40,10 @@ class Barang(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # --- BAGIAN INI YANG PENTING ---
-    def save(self, *args, **kwargs):
-        # 1. Simpan dulu agar dapat ID
-        is_new = self._state.adding
-        super().save(*args, **kwargs)
+    # --- BAGIAN SAVE LAMA DIHAPUS (Dipindah ke Services/Views) ---
+    # Logic pembuatan QR dipindah agar tidak 'Magic' di dalam Models.
+    # Models hanya fokus pada definisi data.
 
-        # 2. Tentukan Port Frontend React kamu
-        # Cek terminal React: biasanya 5173 (Vite) atau 3000 (CRA)
-        frontend_port = "5173" 
-        
-        # 3. Buat URL yang mengarah ke Halaman Detail di Frontend
-        public_url = f"http://localhost:{frontend_port}/barang-public/{self.id}"
-
-        # 4. Generate QR jika gambar belum ada atau barang baru
-        if not self.qr_image or is_new:
-            generate_qr_for_barang(self, public_url)
-            # Simpan field qr_image saja agar hemat resource
-            super().save(update_fields=['qr_image'])
 
     def __str__(self):
         return self.nama_barang
