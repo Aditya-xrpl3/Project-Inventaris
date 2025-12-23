@@ -62,7 +62,20 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'inventaris_backend.urls'
 
-# ... (Templates config remains same)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'frontend_build'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 WSGI_APPLICATION = 'inventaris_backend.wsgi.application'
 
@@ -70,12 +83,10 @@ WSGI_APPLICATION = 'inventaris_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-import dj_database_url
-
 DATABASES = {
     'default': dj_database_url.config(
-        default='mysql://django:passwordku@localhost:3306/inventaris',
-        conn_max_age=600
+        default=config('DATABASE_URL', default='mysql://django:passwordku@localhost:3306/inventaris'),
+        conn_max_age=60  # Short connection age for transaction pooler compatibility
     )
 }
 
